@@ -18,6 +18,9 @@ limitations under the License.
 #include <Python.h>
 
 #include <string>
+#include <vector>
+
+#include "tensorflow/compiler/mlir/quantization/tensorflow/python/py_function_lib.h"
 
 namespace toco {
 
@@ -35,16 +38,21 @@ PyObject* TocoConvert(PyObject* model_flags_proto_txt_raw,
                       PyObject* input_contents_txt_raw,
                       bool extended_return = false,
                       PyObject* debug_info_txt_raw = nullptr,
-                      bool enable_mlir_converter = false);
-
-// Returns a list of names of all ops potentially supported by tflite.
-PyObject* TocoGetPotentiallySupportedOps();
+                      bool enable_mlir_converter = false,
+                      const tensorflow::quantization::PyFunctionLibrary*
+                          quantization_py_function_library = nullptr);
 
 // Quantize the model with calibration data. Throw errors if `fully_quantize`
 // is specified by the calibration data are not sufficient to quantize the
 // model.
 PyObject* MlirQuantizeModel(PyObject* data, bool disable_per_channel,
-                            bool fully_quantize, int inference_type);
+                            bool fully_quantize, int inference_type,
+                            int input_data_type, int output_data_type,
+                            bool enable_numeric_verify = false,
+                            bool enable_whole_model_verify = false,
+                            PyObject* op_denylist = nullptr,
+                            PyObject* node_denylist = nullptr,
+                            bool enable_variable_quantization = false);
 
 // Sparsifies model to encode sparse tensors with proper format. Throws error if
 // sparsification fails.
@@ -52,6 +60,16 @@ PyObject* MlirSparsifyModel(PyObject* data);
 
 // Registers the given custom opdefs to TensorFlow global op registry.
 PyObject* RegisterCustomOpdefs(PyObject* list);
+
+// Returns the collected TFLite conversion errors.
+const std::vector<std::string> RetrieveCollectedErrors();
+
+// Returns MLIR string dump of the given Flatbuffer model.
+std::string FlatBufferFileToMlir(const std::string& model,
+                                 bool input_is_filepath);
+
+// All the exported functions should be listed in
+// tensorflow/tools/def_file_filter/symbols_pybind.txt for the Windows build.
 }  // namespace toco
 
 #endif  // TENSORFLOW_LITE_TOCO_PYTHON_TOCO_PYTHON_API_H_

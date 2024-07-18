@@ -17,12 +17,10 @@ limitations under the License.
 
 #include <algorithm>
 
-#include "tensorflow/lite/c/common.h"
+#include "tensorflow/lite/core/c/common.h"
 #include "tensorflow/lite/kernels/kernel_util.h"
 
-#ifdef __cplusplus
 extern "C" {
-#endif
 
 JNIEXPORT jlong JNICALL
 Java_org_tensorflow_lite_InterpreterTest_getNativeHandleForDelegate(
@@ -97,6 +95,4 @@ Java_org_tensorflow_lite_InterpreterTest_getNativeHandleForInvalidDelegate(
   return reinterpret_cast<jlong>(&delegate);
 }
 
-#ifdef __cplusplus
 }  // extern "C"
-#endif  // __cplusplus
